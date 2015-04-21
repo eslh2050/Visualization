@@ -1,0 +1,162 @@
+---
+title: ""
+author: ""
+date: "Monday, February 02, 2015"
+output: pdf_document
+---
+
+library(ggplot2)
+library(gcookbook)
+
+```{r}
+library(ggplot2)
+library(gcookbook)
+head(mtcars)
+nrow(mtcars)
+```
+
+```{r}
+ggplot(data=mtcars, aes(y=as.factor(carb), x=mpg, colour=hp)) +
+    geom_point()
+
+qplot(wt, mpg, data = mtcars, 
+      shape = as.factor(cyl), 
+      size = qsec,
+      col = as.factor(cyl), 
+      geom = c("point", "smooth"), 
+      se = FALSE,
+      method = "lm")
+```
+
+## 2
+
+```{r}
+ggplot(mtcars, aes(qsec, wt)) +
+   facet_grid(. ~ cyl) +
+   stat_smooth(method=lm) + geom_point()
+
+ggplot(mtcars, aes(qsec, wt)) +
+   facet_grid(. ~ cyl) +
+   stat_smooth(method=lm, fullrange = TRUE) + geom_point()
+
+ggplot(mtcars, aes(y=wt, x=mpg, color=factor(cyl))) +
+  stat_smooth(method=lm, aes(fill = factor(cyl))) + geom_point()
+```
+
+
+
+## 1
+
+```{r}
+ggplot(mtcars,aes(x = wt,y = mpg,color=factor(cyl),shape=factor(cyl),size=qsec)) +
+  stat_smooth(method=lm, aes(fill = factor(cyl))) + geom_point() +
+  geom_text(aes(label=rownames(mtcars)), size=3.5, color = "black")
+
+ggplot(mtcars,aes(x = wt,y = mpg,color=factor(cyl),shape=factor(cyl),size=qsec)) +
+  stat_smooth(method=lm, fullrange=TRUE, alpha = 0.1) + geom_point() +
+  geom_text(aes(label=rownames(mtcars)), size=3, color = "black")
+
+```
+
+
+## 3
+
+```{r}
+ggplot(mtcars) + geom_boxplot(aes(x = cyl, y = mpg, fill = as.factor(cyl))) +
+  labs(title = 'Miles/gallon v/s Number of cylinders', x = 'Number of cylinders', y = 'Miles/gallon')
+```
+
+
+## 4
+
+```{r}
+ggplot(mtcars, aes(x = factor(gear),y = mpg)) +
+  geom_point(aes(color=wt)) +
+  scale_x_discrete("Number of Gears",breaks = c("3","4","5"),labels=c("Three","Four","Five")) +
+  scale_color_gradient2("Weight",breaks=with(mtcars, c(min(wt),median(wt),max(wt))), 
+                       labels=c("Light","Medium","Heavy"),low="#e5f5f9",mid = "red", high="#2ca25f",
+                       midpoint = median(mtcars$wt)
+                       )
+```
+
+
+
+
+## 5
+
+```{r}
+mtcars$carb2 <- factor(mtcars$carb, levels=rev(levels(factor(mtcars$carb))))
+ggplot(data = mtcars, aes(y = carb2, x = mpg, colour = hp)) + geom_point() + 
+  facet_grid(cyl ~ .)
+
+```
+
+
+## 6
+
+```{r}
+library(gridExtra)
+mtcars3 <- mtcars2 <- data.frame(car = rownames(mtcars), mtcars, row.names = NULL)
+mtcars3$cyl <- mtcars2$cyl <- as.factor(mtcars2$cyl)
+head(mtcars2)
+
+x <- ggplot(mtcars2, aes(y = car, x = mpg)) + geom_point(stat = "identity")
+y <- ggplot(mtcars2, aes(x = car, y = mpg)) + geom_bar(stat = "identity") + 
+    coord_flip()  # Flipped cartesian coordinates so that horizontal becomes vertical, and vertical, horizontal.
+grid.arrange(x, y, ncol = 2)
+
+mtcars3$car <- factor(mtcars2$car, levels = mtcars2[order(mtcars$mpg), "car"])
+x <- ggplot(mtcars3, aes(y = car, x = mpg)) + geom_point(stat = "identity")
+y <- ggplot(mtcars3, aes(x = car, y = mpg)) + geom_bar(stat = "identity") + 
+    coord_flip()
+grid.arrange(x, y, ncol = 2)
+
+ggplot(mtcars3, aes(y = car, x = mpg)) + geom_point(stat = "identity") + facet_grid(cyl ~ ., scales = "free", space = "free")
+```
+
+
+##7
+```{r}
+p <- ggplot(mtcars, aes(mpg, wt))
+p + geom_point(colour="grey50", size = 4) + geom_point(aes(colour = cyl))
+
+p + aes(shape = factor(cyl)) +
+  geom_point(aes(colour = factor(cyl)), size = 4) +
+  geom_point(colour="grey90", size = 1.5)
+
+p + geom_point(colour="black", size = 4.5) +
+  geom_point(colour="pink", size = 4) +
+  geom_point(aes(shape = factor(cyl)))
+
+p + geom_point(colour="black", size = 4.5, show_guide = TRUE) +
+  geom_point(colour="pink", size = 4, show_guide = TRUE) +
+  geom_point(aes(shape = factor(cyl)))
+```
+
+
+##8
+```{r}
+qplot(mpg, wt, data = mtcars, size = I(5), alpha = I(0.2))
+```
+
+
+```{r}
+ggplot(mtcars, aes(x =  hp, y = mpg)) + geom_point(aes(color = wt)) +
+  stat_smooth(method = "lm", se = FALSE)
+
+ggplot(mtcars,aes(x = wt,y = mpg,color=factor(cyl),shape=factor(cyl),size=qsec)) +
+  geom_point() +
+  stat_smooth(method = "lm", se = FALSE)
+
+ggplot(mtcars, aes(x = hp, y = mpg)) + geom_point() +
+  stat_smooth(method = "lm", formula = y ~ x, size = 1)
+
+ggplot(mtcars, aes(x = hp, y = mpg)) + geom_point() + 
+  stat_smooth(method = "loess", formula = y ~ x, size = 1)
+```
+
+
+
+
+
+
